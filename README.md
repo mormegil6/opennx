@@ -52,8 +52,8 @@ The protocol was reverse-engineered from the device; the full write-up is in
   live: bytes 25/50/100 give 24.7/49.6/96.7 Hz. It does **not** stream on connect
   and needs no keep-alive.
 - Each notification is **10 bytes**: a **quaternion as 4x int16 LE**
-  (`value = raw / 32767 * 2`, roughly Q14, normalised to unit length) plus 2
-  status bytes.
+  (`value = raw / 32767 * 2`, roughly Q14, normalised to unit length) plus a
+  constant 2-byte marker (`00 03`; not live status - verified invariant).
 - Verified axis/sign convention (tracker worn): **yaw-left = negative**,
   **pitch-up = positive**, roll right-ear-down = negative.
 - Battery (`0x2A19`) is exposed raw and is **uncalibrated** (can read >100).
