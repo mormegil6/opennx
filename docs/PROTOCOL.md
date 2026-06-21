@@ -117,7 +117,9 @@ a seconds counter, and it does not govern connected-idle sleep observably here).
 identify / reserved bytes) produced the same 10-byte quaternion packet. There is
 no accel/gyro/magnetometer or other raw-IMU output: the sensor fusion runs on
 the device (consistent with the official app, whose BLE layer only ever consumes
-a quaternion). The 2 trailing status bytes are the only non-orientation payload.
+a quaternion). The 2 trailing bytes are a constant `00 03` (a fixed marker, not
+live temperature or calibration - see the packet-format section), the only
+non-orientation payload.
 
 NXOSC's "Calibrate" button writes `... 00` then `... 01`, i.e. it just toggles
 `run` off then on (a stream restart). That is why it does **not** re-zero the
@@ -175,7 +177,7 @@ offset  bytes        meaning
 2..3    int16 LE     q1
 4..5    int16 LE     q2
 6..7    int16 LE     q3
-8..9    uint8 x2     status / calibration-quality, constant 00 03 in good streaming
+8..9    uint8 x2     constant marker, always 00 03 (not orientation; see below)
 ```
 
 - Each component is **Q14-ish fixed point**: `value = raw_int16 / 32767 * 2`
@@ -184,7 +186,14 @@ offset  bytes        meaning
   (`scvtf; fdiv #32767; fadd self`). Norm of the decoded quaternion is **1.000**
   across all captured packets.
 - The trailing `00 03` bytes are not used for orientation by the NXOSC parser
-  (loop reads exactly 4 int16). Likely a calibration/quality status.
+  (loop reads exactly 4 int16), and they are **constant**: verified invariant at
+  `00 03` across 6687 captured packets spanning stillness, vigorous motion, and a
+  deliberate BNO055 calibration routine (gyro-still, 6-face accel, figure-8 mag)
+  during which the quaternion swept the full range. They therefore carry **no live
+  temperature and no live calibration status** - a live `CALIB_STAT` would have
+  changed during that routine - and appear to be a fixed marker/format field. The
+  BNO055's `TEMP` (reg `0x34`) and `CALIB_STAT` (reg `0x35`) exist on-chip but are
+  not forwarded over BLE; reading them would need custom firmware (see HOST_VQF.md).
 
 Example packet `f5 da 44 0a 2c f7 67 32 00 03`:
 `q = (-0.579, 0.160, -0.138, 0.788)`, norm `1.000`.
@@ -285,10 +294,12 @@ static analysis; nothing was modified or flashed).
   app 1.19 / bl 1.13 build is the only firmware that exists for the unit.
 - **IMU: Bosch BNO055** on the nRF51 I2C/TWI bus. Identified from: the on-chip
   fusion quaternion format (4x int16, 2^14 LSB = Q14) matching the BNO055
-  quaternion registers `0x20-0x27` exactly; the trailing status byte matching
-  `CALIB_STAT` (reg `0x35`, `0x03` = calibrated); the chip-id constant `0xA0`; and
-  BNO055 `OPR_MODE` register/value patterns in the driver. The BNO055 runs its own
-  NDOF fusion; the nRF51 reads its quaternion + calib status and forwards them.
+  quaternion registers `0x20-0x27` exactly; the chip-id constant `0xA0`; and BNO055
+  `OPR_MODE` register/value patterns in the driver. The BNO055 runs its own NDOF
+  fusion; the nRF51 reads its quaternion registers and forwards them over BLE,
+  followed by a constant 2-byte marker (`00 03`; not a live status - see the
+  orientation-packet section). (The trailing `0x03` happens to coincide with a
+  plausible `CALIB_STAT` value but is constant, so it is not used as ID evidence.)
 
 ### Implication for raw IMU data
 Because fusion happens on the BNO055 and the nRF51 only forwards the quaternion,
