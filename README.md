@@ -8,17 +8,31 @@ audio. It is built on bleak, so it is meant to be cross-platform, but so far it 
 untested (see [Future work](#future-work)).
 
 `opennx.py` connects to the Nx tracker over Bluetooth LE, starts its on-board
-orientation stream, and sends the head-tracking quaternion as OSC to common
-spatial-audio plugins:
+orientation stream, and sends the head-tracking orientation as OSC to a chosen
+spatial-audio renderer. Each renderer wants a particular OSC address, argument
+order, per-axis sign convention and UDP port, so OpenNx uses selectable
+**profiles** (`--profile`) instead of blasting a few fixed addresses at once.
 
-| OSC address | Arguments | Target |
+Supported renderers (see `--list-profiles`):
+
+| Profile | OSC address | Default port |
 |---|---|---|
-| `/SceneRotator/quaternions` | `qw qx qy qz` | IEM Plugin Suite (SceneRotator) |
-| `/ypr` | `yaw pitch roll` (degrees) | SPARTA, Atmoky, dearVR |
-| `/Virtuoso/quat` | `qw qx qy qz` | APL Virtuoso |
+| `IEM SceneRotator (quaternion)` (default) | `/SceneRotator/qw,qx,qy,qz` | 9000 |
+| `IEM SceneRotator (YPR)` | `/SceneRotator/yaw,pitch,roll` | 9000 |
+| `SPARTA` | `/ypr` | 9000 |
+| `APL Virtuoso` | `/Virtuoso/quat` | 8000 |
+| `Dolby Atmos Renderer` | `/ypr` | 8000 |
+| `dearVR` | `/ypr` | 7001 |
+| `EAR Production Suite` | `/ypr` | 8000 |
+| `Mach1 Monitor` | `/orientation` | 9898 |
+| `Nuendo (HeadPose 25Hz)` | `/head_pose` | 7000 |
+| `SPAT Revolution` | `/room/1/ypr` | 8000 |
+| `Quaternion (generic)` | `/quaternion` | 8000 |
+| `YPR (generic)` | `/ypr` | 8000 |
 
-All three are sent on every update (default `127.0.0.1:8000`), so several
-plugins can be driven at once.
+Each profile applies the correct address, per-axis sign/swap and port. Axis and
+sign conventions are verified against Supperware Bridgehead's published profile
+list.
 
 **Protocol:** the full reverse-engineered BLE protocol and hardware notes are in
 [docs/PROTOCOL.md](docs/PROTOCOL.md).
@@ -81,7 +95,8 @@ address is the device **MAC**. Either way the value is printed during the scan.
   directly by address with `--device`.
 - Battery level read on connect (raw; see the quirk above).
 - Orientation quaternion streaming, default 50 Hz, selectable with `--rate`.
-- OSC output to the three addresses above.
+- Selectable per-renderer OSC profiles (`--profile` / `--list-profiles`); several
+  at once with port-collision detection.
 - Yaw/pitch/roll shown in the terminal at about 5 Hz.
 - Tare (zero the heading) with the **Enter** key.
 - Locate the unit by blinking its LED red (`--identify`).
@@ -105,18 +120,32 @@ Skip the scan with a known address/UUID (printed during the scan):
 
 ```bash
 python opennx.py --device XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX   # macOS UUID
-python opennx.py --port 9000               # different OSC port
+python opennx.py --profile SPARTA          # emit the SPARTA profile (port 9000)
+python opennx.py --profile "APL Virtuoso" --port 8001   # override the port
+python opennx.py --list-profiles           # show every profile and exit
 python opennx.py --rate 100                # request 100 Hz instead of 50
 python opennx.py --all                     # list all BLE devices if no Nx is found
 ```
+
+Choosing a renderer:
+
+- `--profile NAME` picks the OSC profile (default `IEM SceneRotator (quaternion)`).
+  Names match case-insensitively and by unique substring, so `--profile sparta`
+  or `--profile virtuoso` work; `--list-profiles` prints them all.
+- The profile sets the address, mapping **and port**; `--port` is an optional
+  override of that port.
+- `--profile` can be repeated to drive several renderers at once. If two selected
+  profiles share a port they would collide on the same UDP socket, so OpenNx
+  refuses and lists the clash; give them different ports or pass
+  `--force-collision` to send anyway.
 
 `--rate HZ` sets the output rate (verified 25-100 Hz; the device caps at ~100).
 `--identify` blinks the tracker LED red (~10 times) on connect to locate the
 unit. `--standby N` writes the standby-timeout byte; it is decoded from the
 official app but its effect is not separately verified here.
 
-Set the plugin's OSC receive to `127.0.0.1:<port>` (default 8000). Press
-**Enter** while looking forward to zero the heading.
+Point the renderer's OSC receive at `127.0.0.1` on the profile's port (shown by
+`--list-profiles`). Press **Enter** while looking forward to zero the heading.
 
 ### Testing without a plugin
 
@@ -186,6 +215,7 @@ run the bridge but document how every finding was obtained. See
 | File | Purpose |
 |---|---|
 | `opennx.py` | the head tracker bridge |
+| `profiles.py` | OSC renderer profiles (shared file, kept in sync with mmrl-osc) |
 | `osc_monitor.py` | OSC listener for testing |
 | `requirements.txt` | bleak, python-osc |
 | `docs/PROTOCOL.md` | full reverse-engineered protocol |

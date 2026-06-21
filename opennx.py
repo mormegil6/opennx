@@ -28,6 +28,8 @@ import time
 from bleak import BleakScanner, BleakClient
 from pythonosc.udp_client import SimpleUDPClient
 
+import profiles
+
 
 # ---------------------------------------------------------------------------
 # Waves Nx GATT protocol (see docs/PROTOCOL.md)
@@ -68,7 +70,7 @@ NAME_HINTS = ("nx tracker", "nx head tracker", "waves nx", "wavesnx")
 # ---------------------------------------------------------------------------
 # Module-level state
 # ---------------------------------------------------------------------------
-osc = None                # SimpleUDPClient, created in run()
+outputs = []              # list of (profiles.Profile, SimpleUDPClient), built in run()
 tare_quat = None          # offset quaternion (w, x, y, z) applied to output, or None
 tare_request = False      # set by the Enter key
 last_print = 0.0          # last terminal update time (5 Hz throttle)
@@ -158,9 +160,9 @@ def process_quaternion(q):
     qw, qx, qy, qz = q
     yaw, pitch, roll = quat_to_ypr(q)
 
-    osc.send_message("/SceneRotator/quaternions", [qw, qx, qy, qz])  # IEM Plugin Suite
-    osc.send_message("/ypr", [yaw, pitch, roll])                     # SPARTA/Atmoky/dearVR
-    osc.send_message("/Virtuoso/quat", [qw, qx, qy, qz])             # APL Virtuoso
+    qt, yprt = (qw, qx, qy, qz), (yaw, pitch, roll)
+    for prof, client in outputs:
+        prof.emit(client, qt, yprt)
 
     # Update the terminal at ~5 Hz.
     now = time.monotonic()
@@ -287,12 +289,16 @@ async def tare_listener():
         tare_request = True
 
 
-async def run(address, port, rate=DEFAULT_RATE, standby=0, identify=0):
-    """Maintain the connection, reconnecting every 3 s on drop."""
-    global osc
-    osc = SimpleUDPClient("127.0.0.1", port)
-    print(f"[osc] sending to 127.0.0.1:{port}  "
-          f"(/SceneRotator/quaternions, /ypr, /Virtuoso/quat)")
+async def run(address, selection, rate=DEFAULT_RATE, standby=0, identify=0):
+    """Maintain the connection, reconnecting every 3 s on drop.
+
+    `selection` is a list of (profiles.Profile, port) from profiles.resolve().
+    """
+    global outputs
+    outputs = [(prof, SimpleUDPClient("127.0.0.1", port)) for prof, port in selection]
+    print("[osc] sending:")
+    for prof, port in selection:
+        print(f"        {prof.name}  ->  127.0.0.1:{port}  {prof.address}")
 
     # Cancel on SIGINT/SIGTERM so the teardown runs and the sensor is released.
     loop = asyncio.get_running_loop()
@@ -327,8 +333,17 @@ def main():
     parser.add_argument("--device", metavar="ADDR",
                         help="BLE address / CoreBluetooth UUID to connect to "
                              "(skips scanning)")
-    parser.add_argument("--port", type=int, default=8000,
-                        help="OSC UDP port on localhost (default: 8000)")
+    parser.add_argument("--profile", action="append", metavar="NAME",
+                        help='OSC profile(s) to emit; repeatable. Default: '
+                             '"IEM SceneRotator (quaternion)". See --list-profiles.')
+    parser.add_argument("--list-profiles", action="store_true",
+                        help="list the available OSC profiles and exit")
+    parser.add_argument("--port", type=int, default=None, metavar="PORT",
+                        help="override the selected profile's UDP port "
+                             "(default: each profile's own port)")
+    parser.add_argument("--force-collision", action="store_true",
+                        help="allow multiple selected profiles to share a port "
+                             "(refused by default)")
     parser.add_argument("--scan-time", type=float, default=8.0,
                         help="BLE scan duration in seconds (default: 8)")
     parser.add_argument("--all", action="store_true", dest="show_all",
@@ -341,6 +356,26 @@ def main():
                         help="blink the tracker LED (red, ~10x) to locate it, on connect")
     args = parser.parse_args()
 
+    if args.list_profiles:
+        print(profiles.format_list())
+        return
+
+    selection, err = profiles.resolve(args.profile or [profiles.DEFAULT_PROFILE],
+                                      args.port)
+    if err:
+        print(f"[profile] {err}; use --list-profiles to see valid names.")
+        sys.exit(2)
+    clash = profiles.collisions(selection)
+    if clash:
+        for port, ns in clash.items():
+            print(f"[profile] port {port} collision: {', '.join(ns)}")
+        if not args.force_collision:
+            print("[profile] these profiles would share a UDP port and collide. "
+                  "Give them different ports with --port, pick one profile, or pass "
+                  "--force-collision to send anyway.")
+            sys.exit(2)
+        print("[profile] proceeding despite the collision (--force-collision).")
+
     async def main_async():
         address = args.device
         if not address:
@@ -348,7 +383,7 @@ def main():
             if not address:
                 print("No device selected. Exiting.")
                 return
-        await run(address, args.port, args.rate, args.standby, args.identify)
+        await run(address, selection, args.rate, args.standby, args.identify)
 
     try:
         asyncio.run(main_async())
