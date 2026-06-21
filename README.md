@@ -26,6 +26,13 @@ plugins can be driven at once.
 OpenNx ships two scripts: `opennx.py` (the bridge) and `osc_monitor.py` (a test
 listener for the OSC output).
 
+## Related projects
+
+Part of a set of open head-tracking tools for spatial audio:
+
+- [mmrl-osc](https://github.com/mormegil6/mmrl-osc) - Mbientlab MetaMotion RL → OSC head tracker with host-side VQF sensor fusion
+- [jabra-elite10-re](https://github.com/mormegil6/jabra-elite10-re) - Jabra Elite 10 Gen 2 BLE GATT protocol reverse-engineering (head-tracking service + Fast Pair auth)
+
 ## Why this exists
 
 The only ready-made OSC bridge, [NXOSC](https://audiooo.com/nxosc), is a
@@ -182,6 +189,7 @@ run the bridge but document how every finding was obtained. See
 | `osc_monitor.py` | OSC listener for testing |
 | `requirements.txt` | bleak, python-osc |
 | `docs/PROTOCOL.md` | full reverse-engineered protocol |
+| `docs/HOST_VQF.md` | host-side VQF / raw-data pathway notes (exploratory) |
 | `tools/` | staged reverse-engineering scripts |
 
 ## References
