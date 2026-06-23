@@ -78,7 +78,10 @@ The protocol was reverse-engineered from the device; the full write-up is in
 - Verified axis/sign convention (tracker worn): **yaw-left = negative**,
   **pitch-up = positive**, roll right-ear-down = negative.
 - Battery (`0x2A19`) is exposed raw and is **uncalibrated** (can read >100).
-- The physical button does not send BLE events, so taring is via the keyboard.
+- The physical button's BLE behaviour is unverified. opennx subscribes to the
+  `0xA052` "button/status" notify characteristic and tares on a press (rising
+  edge), but on the units tested this never fired - the button appears only to
+  wake the device from sleep. The keyboard remains the reliable tare path.
 
 Full details, including the head-frame quaternion remap and example packets, are
 in [docs/PROTOCOL.md](docs/PROTOCOL.md).
@@ -98,7 +101,8 @@ address is the device **MAC**. Either way the value is printed during the scan.
 - Selectable per-renderer OSC profiles (`--profile` / `--list-profiles`); several
   at once with port-collision detection.
 - Yaw/pitch/roll shown in the terminal at about 5 Hz.
-- Tare (zero the heading) with the **Enter** key.
+- Tare (zero the heading) with the **Enter** key (also, best-effort, a press of
+  the device button - see the note above).
 - Locate the unit by blinking its LED red (`--identify`).
 - Auto-reconnect every 3 s if the link drops.
 - Clean shutdown on Ctrl-C or kill (SIGTERM): stops streaming before
