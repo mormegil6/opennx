@@ -56,7 +56,7 @@ short code (`0xA015` etc.); expand with the base to get the full UUID.
 | Char | Handle | Properties | Purpose (working hypothesis) | Initial value |
 |------|--------|------------|------------------------------|---------------|
 | `0xA051` | 22 | write, read | (unknown, empty) | `` (len 0) |
-| `0xA052` | 24 | notify, read | Button / status (1 byte) | `00` |
+| `0xA052` | 24 | notify, read | Status (1 byte); not a button input - silent on press | `00` |
 
 ### Service 0xA030: command channel
 | Char | Handle | Properties | Purpose (working hypothesis) |
@@ -243,9 +243,10 @@ percentage as approximate (e.g. clamp the display to 100). It also fires
 unsolicited notifications ~every 5 s.
 
 ### Button / status characteristics
-The physical button does **not** emit BLE notifications: tapping it during
-streaming produced nothing on `0xA052` or `0xA031` (and did not interrupt the
-`0xA015` stream). So there is **no device-button tare**; use a software tare.
+The physical button does **not** emit BLE notifications: pressing it (short taps
+and a long hold) produced nothing on `0xA052`, `0xA031`, or any other
+notify/indicate characteristic, and did not interrupt the `0xA015` stream. So
+there is **no device-button tare**; use a software tare.
 `0xA030/0xA031/0xA032` and `0xA050/0xA051/0xA052` are used by the official Waves
 Nx app for OTA firmware update / device control, not orientation.
 

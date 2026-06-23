@@ -41,7 +41,6 @@ NX_SERVICE   = "0000a010-5761-7665-7341-7564696f4c74"
 NX_DATA_CHAR = "0000a015-5761-7665-7341-7564696f4c74"  # orientation (notify)
 NX_CTRL_CHAR = "0000a011-5761-7665-7341-7564696f4c74"  # control point (write)
 BATTERY_CHAR = "00002a19-0000-1000-8000-00805f9b34fb"  # standard battery level
-NX_BUTTON_CHAR = "0000a052-5761-7665-7341-7564696f4c74"  # button / status (notify, 1 byte)
 
 # Control point 0xA011 takes a 5-byte config (the official app's sendIMUParams):
 #   [rate_Hz, standby, 0x00, identify, run]
@@ -73,9 +72,8 @@ NAME_HINTS = ("nx tracker", "nx head tracker", "waves nx", "wavesnx")
 # ---------------------------------------------------------------------------
 outputs = []              # list of (profiles.Profile, SimpleUDPClient), built in run()
 tare_quat = None          # offset quaternion (w, x, y, z) applied to output, or None
-tare_request = False      # set by the Enter key or the device button
+tare_request = False      # set by the Enter key
 last_print = 0.0          # last terminal update time (5 Hz throttle)
-_button_prev = 0          # last 0xA052 button byte, for press (rising-edge) detection
 
 
 # ---------------------------------------------------------------------------
@@ -181,19 +179,6 @@ def notification_handler(_sender, data):
         process_quaternion(q)
 
 
-def button_handler(_sender, data):
-    """Nx button (0xA052): a press (rising edge) zeroes the heading.
-
-    Unverified: on some units the button may instead only wake/sleep the device.
-    """
-    global tare_request, _button_prev
-    v = data[0] if data else 0
-    if v and not _button_prev:
-        tare_request = True
-        print("\n[nx] button -> tare")
-    _button_prev = v
-
-
 # ---------------------------------------------------------------------------
 # Scanning and device selection
 # ---------------------------------------------------------------------------
@@ -252,7 +237,6 @@ async def scan_and_pick(scan_time, show_all=False):
 # ---------------------------------------------------------------------------
 async def stream(address, rate=DEFAULT_RATE, standby=0, identify=0):
     """Connect, read battery, start the orientation stream, run until dropped."""
-    global _button_prev
     disconnected = asyncio.Event()
 
     def on_disconnect(_client):
@@ -273,17 +257,12 @@ async def stream(address, rate=DEFAULT_RATE, standby=0, identify=0):
             print(f"[battery] unavailable ({e})")
 
         # Subscribe first, then arm streaming with the requested config.
-        _button_prev = 0
         await client.start_notify(NX_DATA_CHAR, notification_handler)
-        try:
-            await client.start_notify(NX_BUTTON_CHAR, button_handler)   # button -> tare
-        except Exception as e:
-            print(f"[nx] button notify unavailable ({e})")
         await client.write_gatt_char(
             NX_CTRL_CHAR, build_config(rate, standby, identify, run=1), response=True)
 
         print(f"[nx] streaming orientation (~{rate} Hz).")
-        print("     Press Enter or the device button to tare (zero the heading).  Ctrl-C to quit.\n")
+        print("     Press Enter to tare (zero the heading).  Ctrl-C to quit.\n")
 
         try:
             await disconnected.wait()       # until the device drops or this is cancelled
@@ -295,7 +274,6 @@ async def stream(address, rate=DEFAULT_RATE, standby=0, identify=0):
                         NX_CTRL_CHAR, build_config(rate, standby, identify, run=0),
                         response=True)
                     await client.stop_notify(NX_DATA_CHAR)
-                    await client.stop_notify(NX_BUTTON_CHAR)
                 except Exception:
                     pass
 
