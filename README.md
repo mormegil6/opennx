@@ -44,7 +44,7 @@ listener for the OSC output).
 
 Part of a set of open head-tracking tools for spatial audio:
 
-- **mmrl-osc** ([GitLab](https://git.pg.edu.pl/p829296/mmrl-osc) / [GitHub](https://github.com/mormegil6/mmrl-osc)) - Mbientlab MetaMotion RL → OSC head tracker with host-side VQF sensor fusion
+- **mmrl-osc** ([GitLab](https://git.pg.edu.pl/p829296/mmrl-osc) / [GitHub](https://github.com/mormegil6/mmrl-osc)) - Mbientlab MetaMotion RL -> OSC head tracker with host-side VQF sensor fusion
 - **jabra-elite10-re** ([GitLab](https://git.pg.edu.pl/p829296/jabra-elite10-re) / [GitHub](https://github.com/mormegil6/jabra-elite10-re)) - Jabra Elite 10 Gen 2 BLE GATT protocol reverse-engineering (head-tracking service + Fast Pair auth)
 
 ## Why this exists
