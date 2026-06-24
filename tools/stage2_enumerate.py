@@ -24,7 +24,7 @@ from bleak.uuids import normalize_uuid_str
 # Pinned down in Stage 1 by the power-off differential. This is a macOS
 # CoreBluetooth per-host UUID (not a MAC); it is stable for this Mac+device.
 # Advertised name "Nx Tracker", service 0xA010, mfg company 0x00AE "WavesNX001".
-NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # set to your device address (per-Mac UUID on macOS, shown during a scan)
 
 # A few well-known 16-bit UUIDs so the output is readable without a lookup.
 KNOWN = {

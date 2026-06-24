@@ -29,7 +29,7 @@ import sys
 from bleak import BleakClient
 from bleak.uuids import normalize_uuid_str
 
-NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # set to your device address (per-Mac UUID on macOS, shown during a scan)
 
 
 def short_id(uuid):

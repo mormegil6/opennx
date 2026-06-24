@@ -27,7 +27,7 @@ import time
 
 from bleak import BleakClient
 
-NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # set to your device address (per-Mac UUID on macOS, shown during a scan)
 A011 = "0000a011-5761-7665-7341-7564696f4c74"   # control (write start)
 A015 = "0000a015-5761-7665-7341-7564696f4c74"   # orientation (notify)
 START_CMD = bytes.fromhex("3200000001")          # config: rate=50Hz(0x32), run=1

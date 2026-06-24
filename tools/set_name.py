@@ -17,7 +17,7 @@ import sys
 
 from bleak import BleakClient
 
-NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+NX_ADDRESS = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # set to your device address (per-Mac UUID on macOS, shown during a scan)
 NAME_CHAR = "0000a018-5761-7665-7341-7564696f4c74"
 NAME_LEN = 16
 
