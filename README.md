@@ -13,7 +13,8 @@ spatial-audio renderer. Each renderer wants a particular OSC address, argument
 order, per-axis sign convention and UDP port, so OpenNx uses selectable
 **profiles** (`--profile`) instead of blasting a few fixed addresses at once.
 
-Supported renderers (see `--list-profiles`):
+<details>
+<summary>Supported renderers (19 profiles; click to expand, or run <code>--list-profiles</code>)</summary>
 
 | Profile | OSC address | Default port |
 |---|---|---|
@@ -29,10 +30,23 @@ Supported renderers (see `--list-profiles`):
 | `SPAT Revolution` | `/room/1/ypr` | 8000 |
 | `Quaternion (generic)` | `/quaternion` | 8000 |
 | `YPR (generic)` | `/ypr` | 8000 |
+| `a1Rotate` | `/yaw,pitch,roll` | 9001 |
+| `Ambi Head HD` | `/yaw,pitch,roll` | 4040 |
+| `Audio Brewers` | `/yaw,pitch,roll` | 8585 |
+| `DaVinci Resolve` | `/ypr` | 8000 |
+| `Genelec Aural ID` | `/euler_x,euler_y,euler_z` | 5005 |
+| `Mach1 VideoPlayer` | `/orientation` | 9902 |
+| `Spatial Audio Designer` | `/yaw` | 7000 |
+
+</details>
 
 Each profile applies the correct address, per-axis sign/swap and port. Axis and
-sign conventions are verified against Supperware Bridgehead's published profile
-list.
+sign conventions are verified against
+[Supperware Bridgehead](https://supperware.co.uk/headtracker-bridgehead)'s
+profile list. You can add your own in `~/Library/Application
+Support/opennx/profiles.txt` (four lines per profile - name, address, args,
+port - in Supperware's `Profiles.txt` format); `opennx.py` loads them on top of
+the built-in profiles. The profile set is shared verbatim with mmrl-osc and Busola.
 
 **Protocol:** the full reverse-engineered BLE protocol and hardware notes are in
 [docs/PROTOCOL.md](docs/PROTOCOL.md).

@@ -9,8 +9,8 @@ yaw/pitch/roll derived from it) to one renderer's expected OSC address, argument
 order, per-axis signs, and default UDP port. Selecting a profile chooses the
 address, the argument mapping, AND the port.
 
-Axis/sign conventions verified against Supperware Bridgehead's published profile
-list (https://supperware.co.uk/headtracker-bridgehead). Credit to Supperware for
+Axis/sign conventions verified against Supperware Bridgehead's profile list
+(https://supperware.co.uk/headtracker-bridgehead). Credit to Supperware for
 collecting these renderer conventions.
 
 Mapping syntax
@@ -101,7 +101,7 @@ class Profile:
                 client.send_message(self.base + suffix, [v])
 
 
-# Profile table. Mappings follow Supperware Bridgehead's published conventions.
+# Profile table. Mappings follow Supperware Bridgehead's profile-list conventions.
 _DEFS = [
     ("IEM SceneRotator (quaternion)", "/SceneRotator/[qw,qx,qy,qz]",   "qw,-qy,qx,-qz",            9000),
     ("IEM SceneRotator (YPR)",        "/SceneRotator/[yaw,pitch,roll]", "yaw,-pitch,-roll",        9000),
@@ -115,10 +115,70 @@ _DEFS = [
     ("SPAT Revolution",               "/room/1/ypr",                    "yaw,pitch,roll",          8000),
     ("Quaternion (generic)",          "/quaternion",                    "qw,qx,qy,qz",             8000),
     ("YPR (generic)",                 "/ypr",                           "yaw,pitch,roll",          8000),
+    # Further apps from Supperware Bridgehead's profile list.
+    ("a1Rotate",                      "/[yaw,pitch,roll]",              "-yaw,pitch,roll",         9001),
+    ("Ambi Head HD",                  "/[yaw,pitch,roll]",              "-yaw:0,pitch:0,-roll:0",  4040),
+    ("Audio Brewers",                 "/[yaw,pitch,roll]",              "yaw:0,pitch:0,roll:0",    8585),
+    ("DaVinci Resolve",               "/ypr",                           "yaw,pitch,roll",          8000),
+    # Bridgehead marks Genelec's pitch term "-pitch__"; the modifier is not
+    # documented here, so the plain axis is used.
+    ("Genelec Aural ID",              "/[euler_x,euler_y,euler_z]",     "-pitch,yaw,-roll",        5005),
+    ("Mach1 VideoPlayer",             "/orientation",                   "-yaw,pitch,roll:0",       9902),
+    ("Spatial Audio Designer",        "/yaw",                           "yaw:0",                   7000),
 ]
 
-PROFILES = {name: Profile(name, addr, args, port) for name, addr, args, port in _DEFS}
+_BUILTINS = {name: Profile(name, addr, args, port) for name, addr, args, port in _DEFS}
+PROFILES = dict(_BUILTINS)
 DEFAULT_PROFILE = "IEM SceneRotator (quaternion)"
+
+
+def reset_to_builtins():
+    """Drop any file-loaded profiles, keeping only the built-in set."""
+    global PROFILES
+    PROFILES = dict(_BUILTINS)
+
+
+def add_from_file(path):
+    """Add user profiles from a Bridgehead-style text file. Returns (added, bad).
+
+    Format: blocks of four non-comment lines separated by blank lines -
+        Name
+        /address          (may use the [a,b,c] suffix-list form)
+        args              (same mapping syntax as the built-ins)
+        port              (a bare port, or 'local PORT' / 'host PORT'; the host is
+                           ignored, as the destination host is set separately)
+    Lines starting with '#' are comments. A profile with the same name as an
+    existing one overrides it. Malformed blocks are skipped (named in `bad`)."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return 0, []
+
+    blocks, block = [], []
+    for raw in text.splitlines():
+        s = raw.strip()
+        if not s:
+            if block:
+                blocks.append(block)
+                block = []
+        elif not s.startswith("#"):
+            block.append(s)
+    if block:
+        blocks.append(block)
+
+    added, bad = 0, []
+    for b in blocks:
+        if len(b) != 4 or not b[1].startswith("/"):
+            continue
+        name, address, args, dest = b
+        try:
+            port = int(dest.split()[-1])     # last token is the port; host ignored
+            PROFILES[name] = Profile(name, address, args, port)
+            added += 1
+        except (ValueError, IndexError, KeyError):
+            bad.append(name)
+    return added, bad
 
 
 def names():

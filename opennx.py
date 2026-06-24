@@ -20,6 +20,7 @@ Requires: bleak, python-osc  (pip install bleak python-osc)
 import argparse
 import asyncio
 import math
+import os
 import signal
 import struct
 import sys
@@ -355,6 +356,10 @@ def main():
     parser.add_argument("--identify", action="store_true",
                         help="blink the tracker LED (red, ~10x) to locate it, on connect")
     args = parser.parse_args()
+
+    # User-defined profiles (Bridgehead-style file, shared format with mmrl-osc).
+    profiles.add_from_file(os.path.expanduser(
+        "~/Library/Application Support/opennx/profiles.txt"))
 
     if args.list_profiles:
         print(profiles.format_list())
