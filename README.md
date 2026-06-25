@@ -11,7 +11,7 @@ untested (see [Future work](#future-work)).
 orientation stream, and sends the head-tracking orientation as OSC to a chosen
 spatial-audio renderer. Each renderer wants a particular OSC address, argument
 order, per-axis sign convention and UDP port, so OpenNx uses selectable
-**profiles** (`--profile`) instead of blasting a few fixed addresses at once.
+**profiles** (`--profile`) rather than a few fixed addresses.
 
 <details>
 <summary>Supported renderers (19 profiles; click to expand, or run <code>--list-profiles</code>)</summary>
@@ -58,6 +58,7 @@ listener for the OSC output).
 
 Part of a set of open head-tracking tools for spatial audio:
 
+- **Busola** ([GitLab](https://git.pg.edu.pl/p829296/busola-app) / [GitHub](https://github.com/mormegil6/busola-app)) - the macOS menu-bar **app**: one GUI for several head trackers (MetaMotion RL, Waves Nx, Supperware, MrHeadTracker), with device discovery, remembered devices, live profile-switching and CSV logging - the conveniences these CLI bridges leave out
 - **mmrl-osc** ([GitLab](https://git.pg.edu.pl/p829296/mmrl-osc) / [GitHub](https://github.com/mormegil6/mmrl-osc)) - Mbientlab MetaMotion RL -> OSC head tracker with host-side VQF sensor fusion
 - **jabra-elite10-re** ([GitLab](https://git.pg.edu.pl/p829296/jabra-elite10-re) / [GitHub](https://github.com/mormegil6/jabra-elite10-re)) - Jabra Elite 10 Gen 2 BLE GATT protocol reverse-engineering (head-tracking service + Fast Pair auth)
 
