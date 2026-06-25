@@ -56,14 +56,6 @@ the built-in profiles. The profile set is shared verbatim with mmrl-osc and Buso
 OpenNx ships two scripts: `opennx.py` (the bridge) and `osc_monitor.py` (a test
 listener for the OSC output).
 
-## Related projects
-
-Part of a set of open head-tracking tools for spatial audio:
-
-- **Busola** ([GitLab](https://git.pg.edu.pl/p829296/busola-app) / [GitHub](https://github.com/mormegil6/busola-app)) - the macOS menu-bar **app**: one GUI for several head trackers (MetaMotion RL, Waves Nx, Supperware, MrHeadTracker), with device discovery, remembered devices, live profile-switching and CSV logging - the conveniences these CLI bridges leave out
-- **mmrl-osc** ([GitLab](https://git.pg.edu.pl/p829296/mmrl-osc) / [GitHub](https://github.com/mormegil6/mmrl-osc)) - Mbientlab MetaMotion RL -> OSC head tracker with host-side VQF sensor fusion
-- **jabra-elite10-re** ([GitLab](https://git.pg.edu.pl/p829296/jabra-elite10-re) / [GitHub](https://github.com/mormegil6/jabra-elite10-re)) - Jabra Elite 10 Gen 2 BLE GATT protocol reverse-engineering (head-tracking service + Fast Pair auth)
-
 ## Why this exists
 
 The only ready-made OSC bridge, [NXOSC](https://audiooo.com/nxosc), is a
@@ -248,6 +240,14 @@ run the bridge but document how every finding was obtained. See
 - [NXOSC](https://audiooo.com/nxosc) - third-party macOS-only OSC bridge by Katsuhiro Chiba.
 - [docs/PROTOCOL.md](docs/PROTOCOL.md) - the reverse-engineered BLE protocol and hardware notes.
 - [docs/HOST_VQF.md](docs/HOST_VQF.md) - notes on a host-side VQF / raw-data pathway (exploratory).
+
+## Related projects
+
+Part of a set of open head-tracking tools for spatial audio:
+
+- **Busola** ([GitLab](https://git.pg.edu.pl/p829296/busola-app) / [GitHub](https://github.com/mormegil6/busola-app)) - the menu-bar **app**: one GUI for several head trackers (MetaMotion RL, Waves Nx, Supperware, MrHeadTracker), with device discovery, remembered devices, live profile-switching and CSV logging - the conveniences these CLI bridges leave out
+- **mmrl-osc** ([GitLab](https://git.pg.edu.pl/p829296/mmrl-osc) / [GitHub](https://github.com/mormegil6/mmrl-osc)) - Mbientlab MetaMotion RL -> OSC head tracker with host-side VQF sensor fusion
+- **jabra-elite10-re** ([GitLab](https://git.pg.edu.pl/p829296/jabra-elite10-re) / [GitHub](https://github.com/mormegil6/jabra-elite10-re)) - Jabra Elite 10 Gen 2 BLE GATT protocol reverse-engineering (head-tracking service + Fast Pair auth)
 
 ## License
 
