@@ -7,6 +7,8 @@ audio. It is built on bleak, so it is meant to be cross-platform, but so far it 
 **developed and tested on macOS (Apple Silicon) only** - Windows and Linux are
 untested (see [Future work](#future-work)).
 
+> **There's a GUI app: Busola** ([GitLab](https://git.pg.edu.pl/p829296/busola-app) / [GitHub](https://github.com/mormegil6/busola-app)). A menu-bar app that drives this tracker - plus MetaMotion RL, Supperware and MrHeadTracker - with device memory, live profile-switching and CSV logging. This repo is the bridge it's built on.
+
 `opennx.py` connects to the Nx tracker over Bluetooth LE, starts its on-board
 orientation stream, and sends the head-tracking orientation as OSC to a chosen
 spatial-audio renderer. Each renderer wants a particular OSC address, argument
