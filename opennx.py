@@ -161,7 +161,11 @@ def process_quaternion(q):
     qw, qx, qy, qz = q
     yaw, pitch, roll = quat_to_ypr(q)
 
-    qt, yprt = (qw, qx, qy, qz), (yaw, pitch, roll)
+    # Map the device quaternion into the internal convention (P^-1) before the SceneRotator
+    # quaternion profile; otherwise SceneRotator gets pitch<->roll swapped and yaw inverted
+    # (verified against an MrHeadTracker wired directly into SceneRotator). The YPR profiles
+    # keep the intuitive device orientation.
+    qt, yprt = (qw, qy, -qx, -qz), (yaw, pitch, roll)
     for prof, client in outputs:
         prof.emit(client, qt, yprt)
 
