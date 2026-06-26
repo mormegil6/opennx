@@ -48,7 +48,7 @@ sign conventions are verified against
 profile list. You can add your own in `~/Library/Application
 Support/opennx/profiles.txt` (four lines per profile - name, address, args,
 port - in Supperware's `Profiles.txt` format); `opennx.py` loads them on top of
-the built-in profiles. The profile set is shared verbatim with mmrl-osc and Busola.
+the built-in profiles. The profile set is shared verbatim with openMMRL and Busola.
 
 **Protocol:** the full reverse-engineered BLE protocol and hardware notes are in
 [docs/PROTOCOL.md](docs/PROTOCOL.md).
@@ -226,7 +226,7 @@ run the bridge but document how every finding was obtained. See
 | File | Purpose |
 |---|---|
 | `opennx.py` | the head tracker bridge |
-| `profiles.py` | OSC renderer profiles (shared file, kept in sync with mmrl-osc) |
+| `profiles.py` | OSC renderer profiles (shared file, kept in sync with openMMRL) |
 | `osc_monitor.py` | OSC listener for testing |
 | `requirements.txt` | bleak, python-osc |
 | `docs/PROTOCOL.md` | full reverse-engineered protocol |
@@ -246,7 +246,7 @@ run the bridge but document how every finding was obtained. See
 Part of a set of open head-tracking tools for spatial audio:
 
 - **Busola** ([GitLab](https://git.pg.edu.pl/p829296/busola-app) / [GitHub](https://github.com/mormegil6/busola-app)) - the menu-bar **app**: one GUI for several head trackers (MetaMotion RL, Waves Nx, Supperware, MrHeadTracker), with device discovery, remembered devices, live profile-switching and CSV logging - the conveniences these CLI bridges leave out
-- **mmrl-osc** ([GitLab](https://git.pg.edu.pl/p829296/mmrl-osc) / [GitHub](https://github.com/mormegil6/mmrl-osc)) - Mbientlab MetaMotion RL -> OSC head tracker with host-side VQF sensor fusion
+- **openMMRL** ([GitLab](https://git.pg.edu.pl/p829296/openmmrl) / [GitHub](https://github.com/mormegil6/openmmrl)) - Mbientlab MetaMotion RL -> OSC head tracker with host-side VQF sensor fusion
 - **jabra-elite10-re** ([GitLab](https://git.pg.edu.pl/p829296/jabra-elite10-re) / [GitHub](https://github.com/mormegil6/jabra-elite10-re)) - Jabra Elite 10 Gen 2 BLE GATT protocol reverse-engineering (head-tracking service + Fast Pair auth)
 
 ## License
