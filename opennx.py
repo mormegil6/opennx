@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-opennx.py - OpenNx: an open OSC bridge for the Waves Nx Head Tracker.
+opennx.py - openNx: an open OSC bridge for the Waves Nx Head Tracker.
 
 Connects to a Waves Nx Head Tracker over BLE (bleak: CoreBluetooth on macOS,
 BlueZ on Linux, WinRT on Windows), starts its orientation stream, and sends the
@@ -334,7 +334,7 @@ async def run(address, selection, rate=DEFAULT_RATE, standby=0, identify=0):
 # ---------------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser(
-        description="OpenNx - Waves Nx Head Tracker OSC bridge (bleak; tested on macOS)")
+        description="openNx - Waves Nx Head Tracker OSC bridge (bleak; tested on macOS)")
     parser.add_argument("--device", metavar="ADDR",
                         help="BLE address / CoreBluetooth UUID to connect to "
                              "(skips scanning)")
@@ -361,7 +361,7 @@ def main():
                         help="blink the tracker LED (red, ~10x) to locate it, on connect")
     args = parser.parse_args()
 
-    # User-defined profiles (Bridgehead-style file, shared format with mmrl-osc).
+    # User-defined profiles (Bridgehead-style file, shared format with openMMRL).
     profiles.add_from_file(os.path.expanduser(
         "~/Library/Application Support/opennx/profiles.txt"))
 

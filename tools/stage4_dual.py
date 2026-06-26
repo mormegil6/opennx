@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from stage4_decode import decode as nx_decode, quat_to_ypr, app_quat, \
     A011, A015, START_CMD, NX_ADDRESS
 
-# --- MMRL / MetaWear (from mmrl_osc.py) ---
+# --- MMRL / MetaWear (from openmmrl.py) ---
 MMRL_ADDRESS   = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # set to your device address (per-Mac UUID on macOS, shown during a scan)
 MW_CMD_CHAR    = "326a9001-85cb-9195-d9dd-464cfbbae75a"
 MW_NOTIFY_CHAR = "326a9006-85cb-9195-d9dd-464cfbbae75a"

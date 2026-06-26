@@ -1,8 +1,8 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)]() [![bleak](https://img.shields.io/badge/bleak-BLE-1F6FEB.svg)]() [![python-osc](https://img.shields.io/badge/python--osc-OSC-1F6FEB.svg)]() [![macOS](https://img.shields.io/badge/macOS-tested-000000.svg?logo=apple&logoColor=white)]() [![Windows | Linux](https://img.shields.io/badge/Windows%20%7C%20Linux-untested-lightgrey.svg)]() [![Device](https://img.shields.io/badge/device-Waves%20Nx%20%C2%B7%20nRF51822%20%2B%20BNO055-8A2BE2.svg)]() [![Protocol](https://img.shields.io/badge/protocol-reverse--engineered-007808.svg)](docs/PROTOCOL.md) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-# OpenNx - an open OSC bridge for the Waves Nx Head Tracker
+# openNx - an open OSC bridge for the Waves Nx Head Tracker
 
-**OpenNx** lets you use a **Waves Nx Head Tracker** as a head tracker for spatial
+**openNx** lets you use a **Waves Nx Head Tracker** as a head tracker for spatial
 audio. It is built on bleak, so it is meant to be cross-platform, but so far it is
 **developed and tested on macOS (Apple Silicon) only** - Windows and Linux are
 untested (see [Future work](#future-work)).
@@ -12,7 +12,7 @@ untested (see [Future work](#future-work)).
 `opennx.py` connects to the Nx tracker over Bluetooth LE, starts its on-board
 orientation stream, and sends the head-tracking orientation as OSC to a chosen
 spatial-audio renderer. Each renderer wants a particular OSC address, argument
-order, per-axis sign convention and UDP port, so OpenNx uses selectable
+order, per-axis sign convention and UDP port, so openNx uses selectable
 **profiles** (`--profile`) rather than a few fixed addresses.
 
 <details>
@@ -53,7 +53,7 @@ the built-in profiles. The profile set is shared verbatim with openMMRL and Buso
 **Protocol:** the full reverse-engineered BLE protocol and hardware notes are in
 [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
-OpenNx ships two scripts: `opennx.py` (the bridge) and `osc_monitor.py` (a test
+openNx ships two scripts: `opennx.py` (the bridge) and `osc_monitor.py` (a test
 listener for the OSC output).
 
 ## Why this exists
@@ -146,7 +146,7 @@ Choosing a renderer:
 - The profile sets the address, mapping **and port**; `--port` is an optional
   override of that port.
 - `--profile` can be repeated to drive several renderers at once. If two selected
-  profiles share a port they would collide on the same UDP socket, so OpenNx
+  profiles share a port they would collide on the same UDP socket, so openNx
   refuses and lists the clash; give them different ports or pass
   `--force-collision` to send anyway.
 
@@ -203,10 +203,10 @@ System Settings > Privacy & Security > Bluetooth.
 
 ## Future work
 
-- **Windows and Linux testing.** OpenNx uses bleak (WinRT on Windows, BlueZ on
+- **Windows and Linux testing.** openNx uses bleak (WinRT on Windows, BlueZ on
   Linux), so it should run there, but it has only been verified on macOS (Apple
   Silicon). Testing and fixes on other platforms are welcome.
-- **Standalone app with a GUI.** Package OpenNx as a self-contained, double-click
+- **Standalone app with a GUI.** Package openNx as a self-contained, double-click
   application (e.g. PyInstaller) with a small GUI for device selection, tare, rate,
   and a live yaw/pitch/roll readout, so it needs no Python install or command line.
 - **Host-side fusion (VQF).** The tracker only emits a fused quaternion; running a
