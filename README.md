@@ -45,9 +45,10 @@ order, per-axis sign convention and UDP port, so openNx uses selectable
 Each profile applies the correct address, per-axis sign/swap and port. Axis and
 sign conventions are verified against
 [Supperware Bridgehead](https://supperware.co.uk/headtracker-bridgehead)'s
-profile list. You can add your own in `~/Library/Application
-Support/opennx/profiles.txt` (four lines per profile - name, address, args,
-port - in Supperware's `Profiles.txt` format); `opennx.py` loads them on top of
+profile list. You can add your own in a `profiles.txt` in this script's per-user
+config dir - `~/Library/Application Support/opennx/` (macOS), `%APPDATA%\opennx`
+(Windows) or `~/.config/opennx/` (Linux). Each profile is four lines - name, address,
+args, port - in Supperware's `Profiles.txt` format; `opennx.py` loads them on top of
 the built-in profiles. The profile set is shared verbatim with openMMRL and Busola.
 
 **Protocol:** the full reverse-engineered BLE protocol and hardware notes are in

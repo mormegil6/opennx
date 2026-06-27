@@ -332,6 +332,19 @@ async def run(address, selection, rate=DEFAULT_RATE, standby=0, identify=0):
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+def _config_dir():
+    """Per-user dir holding this script's OSC profiles file, per OS:
+    macOS ~/Library/Application Support/opennx, Windows %APPDATA%\\opennx,
+    else $XDG_CONFIG_HOME/opennx (or ~/.config/opennx)."""
+    if sys.platform == "darwin":
+        base = os.path.expanduser("~/Library/Application Support")
+    elif os.name == "nt":
+        base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    else:
+        base = os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
+    return os.path.join(base, "opennx")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="openNx - Waves Nx Head Tracker OSC bridge (bleak; tested on macOS)")
@@ -362,8 +375,7 @@ def main():
     args = parser.parse_args()
 
     # User-defined profiles (Bridgehead-style file, shared format with openMMRL).
-    profiles.add_from_file(os.path.expanduser(
-        "~/Library/Application Support/opennx/profiles.txt"))
+    profiles.add_from_file(os.path.join(_config_dir(), "profiles.txt"))
 
     if args.list_profiles:
         print(profiles.format_list())
